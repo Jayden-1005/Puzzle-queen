@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#35105f"><link rel="manifest" href="manifest.webmanifest">
+<title>Puzzle Queen</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f8f3ff;color:#241238}
+header{background:linear-gradient(135deg,#35105f,#6d35a5);color:white;padding:26px 18px;text-align:center}
+h1{margin:0;font-size:30px}header p{margin:7px 0 0}.wrap{max-width:650px;margin:auto;padding:18px}
+.card{background:white;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 4px 18px #35105f15}
+input{width:100%;padding:13px;border:1px solid #d9c9e8;border-radius:10px;font-size:16px;margin:8px 0}
+button{background:#54218a;color:white;border:0;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:bold;margin:5px 4px 5px 0}
+button.alt{background:#e9dcf7;color:#35105f}.stats{display:flex;gap:10px}.stat{flex:1;background:#f0e7fa;padding:12px;border-radius:12px;text-align:center}
+#answer{letter-spacing:5px;font-size:24px;font-weight:bold;text-align:center;margin:18px}
+small{color:#685778}.hidden{display:none}
+</style></head>
+<body>
+<header><h1>👑 Puzzle Queen</h1><p>Think it. Find it. Win it!</p></header>
+<main class="wrap">
+<section class="card" id="account"><h2>Welcome, Queen!</h2><p>Create your demo player profile to begin.</p>
+<input id="nickname" placeholder="Your nickname"><input id="email" type="email" placeholder="Email address">
+<button onclick="start()">Create profile</button><small>This starter saves your profile on this device only. It is not secure account registration.</small></section>
+<section id="game" class="hidden">
+<div class="stats"><div class="stat">⭐ Points<br><b id="points">0</b></div><div class="stat">🪙 Coins<br><b id="coins">0</b></div></div>
+<div class="card"><small id="level">LEVEL 1 · EASY</small><h2 id="question"></h2><div id="answer">_ _ _</div>
+<input id="guess" placeholder="Type your answer" autocomplete="off"><button onclick="check()">Submit answer</button><button class="alt" onclick="next()">Skip</button><p id="feedback"></p></div>
+<div class="card"><h2>🎁 Reward shop</h2><p>Use 20 coins to unlock a virtual gift.</p><button onclick="reward()">Unlock gift · 20 coins</button><p id="gift"></p></div>
+</section>
+</main>
+<script>
+const puzzles=[["I have keys but no locks. What am I?","piano","EASY"],["What has a face and two hands but no arms?","clock","MEDIUM"],["The more you take, the more you leave behind. What are they?","footsteps","HARD"]];
+let i=0,points=0,coins=0;
+function start(){let n=document.getElementById('nickname').value.trim(),e=document.getElementById('email').value.trim();if(!n||!e){alert("Enter your nickname and email.");return}localStorage.setItem('pqprofile',JSON.stringify({n,e}));document.getElementById('account').classList.add('hidden');document.getElementById('game').classList.remove('hidden');render()}
+function render(){document.getElementById('question').textContent=puzzles[i][0];document.getElementById('level').textContent="LEVEL "+(i+1)+" · "+puzzles[i][2];document.getElementById('answer').textContent="_ ".repeat(puzzles[i][1].length);document.getElementById('guess').value="";document.getElementById('feedback').textContent=""}
+function check(){let g=document.getElementById('guess').value.trim().toLowerCase();if(g===puzzles[i][1]){points+=10;coins+=5;document.getElementById('feedback').textContent="Correct! +10 points and +5 coins. 👑";update()}else document.getElementById('feedback').textContent="Not quite. Try again!"}
+function next(){i=(i+1)%puzzles.length;render()}
+function update(){document.getElementById('points').textContent=points;document.getElementById('coins').textContent=coins}
+function reward(){if(coins<20){document.getElementById('gift').textContent="You need more coins. Keep solving puzzles!";return}coins-=20;update();document.getElementById('gift').textContent="🎉 You unlocked a virtual gift! (Demo reward)"}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+</script></body></html>
